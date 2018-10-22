@@ -3,13 +3,6 @@ import { IonicPage, NavController, NavParams, Platform } from 'ionic-angular';
 import { DataProvider } from '../../provider/data/data';
 import { Storage } from '@ionic/storage';
 
-/**
- * Generated class for the LeaderboardPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
-
 @IonicPage()
 @Component({
   selector: 'page-leaderboard',
@@ -20,20 +13,18 @@ export class LeaderboardPage {
   score: number;
   scoreList: any[] = [];
 
-  constructor(public navCtrl: NavController, 
-    public navParams: NavParams, 
-    public dataService: DataProvider, 
+  constructor(public navCtrl: NavController,
+    public navParams: NavParams,
+    public dataService: DataProvider,
     public storage: Storage,
     public platform: Platform) {
 
     this.score = this.navParams.get('score');
   }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad LeaderboardPage');
-    // Platform.ready isn't required in the new Ionic
+  ngOnInit () {
     this.platform.ready().then(() => {
-      /*Storage get*/.then((result) => {
+      this.storage.get('leaderboard').then((result) => {
         let res;
         if(!result) {
           res = []
@@ -46,8 +37,6 @@ export class LeaderboardPage {
           time: Date.now()
         })
 
-        console.log(res);
-
         this.scoreList = res.sort(function(a, b) {
           if(a.score > b.score) {
             return -1;
@@ -56,7 +45,7 @@ export class LeaderboardPage {
           }
         })
 
-        /*Storage set*/.('leaderboard', JSON.stringify(res));
+        this.storage.set('leaderboard', JSON.stringify(res));
       })
     })
   }

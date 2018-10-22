@@ -7,6 +7,7 @@ import { Observable } from 'rxjs/Observable';
   selector: 'page-home',
   templateUrl: 'home.html'
 })
+
 export class HomePage {
 
   moleHoles: MoleHole[] = [];
@@ -15,23 +16,28 @@ export class HomePage {
   gameTimer: any;
   timeLeft: number = 0;
   timerObserver: any;
-  score: 0;
-
+  score: number = 0;
+  scoreUpdate: any;
+  scoreObserver: any;
 
   constructor(public navCtrl: NavController) {
 
-    /**
-     * Create an observer to be passed to the new MoleHoles
-     */
+  // Task: Create an observer to be passed to the new MoleHole
+  this.scoreUpdate = Observable.create(observer => {
+   this.scoreObserver = observer;
+  });
 
-    /**
-     * Subscribe to the observer created above to update the score
-     */
+  // Task: Subscribe to the observer created above to update the score
+  this.scoreUpdate.subscribe(() => {
+   this.score++;
+  })
 
+  // Create moleholes
     for(let i = 0; i<9; i++) {
-      this.moleHoles.push(new MoleHole(i, /*Pass the observer created to the new MoleHoles*/))
+      this.moleHoles.push(new MoleHole( i, this.scoreObserver ))
     }
 
+  //
     let timerUpdate = Observable.create(observer => {
       this.timerObserver = observer;
     });
@@ -43,9 +49,7 @@ export class HomePage {
     this.startGame()
   }
 
-
-
-  startGame(){
+  startGame() {
     const that = this;
     this.score = 0;
 
@@ -59,7 +63,7 @@ export class HomePage {
     this.gameTimer = setInterval(() => {
       that.timeLeft = that.timeLeft - 1;
       that.timerObserver.next(that.timeLeft);
-      if(that.timeLeft <= 0) {
+      if (that.timeLeft <= 0) {
         clearInterval(that.gameTimer);
         this.stopGame();
         this.saveScore();
@@ -75,8 +79,6 @@ export class HomePage {
   }
 
   saveScore() {
-    //This is the old ionic 3.9 syntax, get rid of it.
-    //use ionic 4; use Angular routing across the project.
     this.navCtrl.push('LeaderboardPage', {
       score: this.score
     })
@@ -99,10 +101,10 @@ export class HomePage {
 
   stateToClass(state: number) {
     switch(state) {
-      /**
-       * What should this function do?
-       * Hint: Look in the home.scss file
-       */
+      // Task: Connect to the class that changes the image
+      case 0: return "hid";
+      case 1: return "out";
+      case 2: return "hit";
     }
 }
 
